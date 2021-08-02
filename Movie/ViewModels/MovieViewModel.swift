@@ -9,7 +9,7 @@
 import Foundation
 
 struct MovieViewModel {
-    func getAPIData(param: [String: Any], completion: @escaping (MovieModelNew?, ServiceError?) -> ()) {
+    func getAPIData(param: [String: Any], completion: @escaping (MovieModel?, ServiceError?) -> ()) {
         let request = MovieListAPI()
         
         let apiLoader = APILoader(apiHandler: request)

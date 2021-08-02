@@ -15,7 +15,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
     
    
     public var objMovieViewModel: MovieViewModel?
-    private var listSearchValue = [Search]()
+    private var listSearchValue = [SearchData]()
     var searchResultsFromLocalDB = [SearchMO]()
     var entitySearch: SearchMO!
 
@@ -49,7 +49,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
         collectionView.dataSource = self
         
-        callMoviListAPI(searchMovie: "Avengers")
+       // callMoviListAPI(searchMovie: "Avengers")
        // Do any additional setup after loading the view.
     }
 
@@ -131,8 +131,8 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
                 
                 print("error = \(error?.message ?? "")")
             } else {
-                if let moviModel = model {
-                                        self.listSearchValue = moviModel.Search
+                if let movieModel = model {
+                                        self.listSearchValue = movieModel.Search
                     //print("MovieModel Response = \(moviModel.Response)")
 //                    if moviModel.Response {
 //                        self.saveResponseIntoLocalDB(array: moviModel.Search)
@@ -141,7 +141,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
                                         DispatchQueue.main.async {
                                             self.collectionView?.reloadData()
                                         }
-                    print("movie data = \(moviModel.Search)")
+                   // print("movie data = \(moviModel.Search)")
                 }
                 
             }
@@ -157,7 +157,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         guard let searchText = searchController.searchBar.text else {
             return
         }
-        print(searchText)
+        print("searchText = \(searchText)")
         if !searchText.isEmpty {
            // callMoviListAPI(searchMovie: searchText)
             callMoviListAPI(searchMovie: "Avengers")
@@ -166,7 +166,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
     }
     
-    func saveResponseIntoLocalDB(array : [Search]) {
+    func saveResponseIntoLocalDB(array : [SearchData]) {
         
             _ = array.map{self.saveObjectSearchIntoDB(dictionary: $0)}
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -174,13 +174,13 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
     }
     
-    private func saveObjectSearchIntoDB(dictionary: Search) -> NSManagedObject? {
+    private func saveObjectSearchIntoDB(dictionary: SearchData) -> NSManagedObject? {
         
         //Saving search object into DB
         if let appDelegate = (UIApplication.shared.delegate as? AppDelegate) {
             entitySearch = SearchMO(context: appDelegate.persistentContainer.viewContext)
             entitySearch.title = dictionary.Title
-            entitySearch.imdbID = Int16(dictionary.imdbID)
+            entitySearch.imdbID = dictionary.imdbID
             entitySearch.poster = dictionary.Poster
             entitySearch.year = dictionary.Year
             entitySearch.type = dictionary.Type

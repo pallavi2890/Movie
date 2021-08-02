@@ -13,6 +13,9 @@ struct MovieListAPI : APIHandler{
         //let urlString =  APIPath().gallary
         //let urlString = "http://www.omdbapi.com/?"
         let urlString = "http://www.omdbapi.com/?apikey=def4478&s=Avengers&type=movie"
+        // let urlString = "https://api.kivaws.org/v1/loans/newest.json"
+       // let urlString = "http://www.omdbapi.com/?apikey=def4478&i=tt0848228"
+
         if var url = URL(string: urlString) {
             if param.count > 0 {
                 url = setQueryParams(parameters: param, url: url)
@@ -26,7 +29,7 @@ struct MovieListAPI : APIHandler{
         return nil
     }
     
-    func parseResponse(data: Data, response: HTTPURLResponse) throws -> MovieModelNew {
+    func parseResponse(data: Data, response: HTTPURLResponse) throws -> MovieModel {
         return try defaultParseResponse(data: data,response: response)
     }
 }

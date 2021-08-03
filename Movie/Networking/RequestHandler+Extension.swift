@@ -17,10 +17,7 @@ extension RequestHandler {
         return components?.url ?? url
     }
     
-    #warning("Pallavi check header function")
-//    func setDefaultHeaders(request: inout URLRequest) {
-//        request.setValue(Constants.APIHeaders.contentTypeValue, forHTTPHeaderField: Constants.APIHeaders.kContentType)
-//    }
+
 }
 
 

@@ -16,9 +16,10 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
    
     public var objMovieViewModel: MovieViewModel?
     private var listSearchValue = [SearchData]()
-    var searchResultsFromLocalDB = [SearchMO]()
+    var resultsFromLocalDB = [SearchMO]()
     var entitySearch: SearchMO!
-
+    
+    var searchResults = [SearchMO]()
     var searchController: UISearchController!
     var fetchResultController: NSFetchedResultsController<SearchMO>!
     
@@ -27,9 +28,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
         objMovieViewModel = MovieViewModel()
         
-        // Uncomment the following line to preserve selection between presentations
-         self.clearsSelectionOnViewWillAppear = false
-        
+        self.title = "Search Your Favourite Movie"
         // Configure the layout and item size
         if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = CGSize(width: 170, height: 230)
@@ -50,18 +49,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         collectionView.dataSource = self
         
        // callMoviListAPI(searchMovie: "Avengers")
-       // Do any additional setup after loading the view.
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     // MARK: UICollectionViewDataSource
 
@@ -87,61 +75,22 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         return cell ?? UICollectionViewCell()
     }
     
-    
 
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-    
-    }
-    */
-    // fetch Movie List
+    // MARK: - fetch Movie List
     func callMoviListAPI(searchMovie : String)  {
-        //searchText = "Avengers"
         objMovieViewModel?.getAPIData(param: ["apikey":Constants.APIKeys.kAPIKey,"s" : searchMovie, "type" : "movie"], completion: { (model, error) in
             if let _ = error {
-//                DispatchQueue.main.async {
-//                    let alert = UIAlertController(title: "Error", message: error?.message, preferredStyle: UIAlertController.Style.alert)
-//                    self.present(alert, animated: true, completion: nil)
-//                }
-                
+
                 print("error = \(error?.message ?? "")")
-            } else {
+            }
+            else {
                 if let movieModel = model {
-                                        self.listSearchValue = movieModel.Search
-                    //print("MovieModel Response = \(moviModel.Response)")
-//                    if moviModel.Response {
-//                        self.saveResponseIntoLocalDB(array: moviModel.Search)
-//                    }
+                        self.listSearchValue = movieModel.Search
+                        self.saveResponseIntoLocalDB(array: movieModel.Search)
                     
                                         DispatchQueue.main.async {
                                             self.collectionView?.reloadData()
                                         }
-                   // print("movie data = \(moviModel.Search)")
                 }
                 
             }
@@ -150,22 +99,40 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
   
    
     
-
+    // MARK: - Search methods
+    
+    func filterContent(for searchText: String) -> Bool{
+        searchResults = resultsFromLocalDB.filter({ (Movie) -> Bool in
+            if let name = Movie.title
+                 {
+                
+                let isMatch = name.localizedCaseInsensitiveContains(searchText)
+                return isMatch
+            }
+            
+            return false
+        })
+        return false
+    }
 
     func updateSearchResults(for searchController: UISearchController) {
         
         guard let searchText = searchController.searchBar.text else {
             return
         }
-        print("searchText = \(searchText)")
-        if !searchText.isEmpty {
-           // callMoviListAPI(searchMovie: searchText)
-            callMoviListAPI(searchMovie: "Avengers")
+        if (searchController.searchBar.text?.count)! > 2 {
+            if (filterContent(for: searchText)) {
+                fetchDataFromLocalDB()
+            }
+            else{
+            callMoviListAPI(searchMovie: searchText)
+            }
             
         }
         
     }
     
+    //MARK : - SAVE RESPONSE INTO LOCAL DB
     func saveResponseIntoLocalDB(array : [SearchData]) {
         
             _ = array.map{self.saveObjectSearchIntoDB(dictionary: $0)}
@@ -189,6 +156,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         return nil
     }
     
+    
     func fetchDataFromLocalDB()  {
         let fetchRequest: NSFetchRequest<SearchMO> = SearchMO.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
@@ -203,7 +171,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
             do {
                 try fetchResultController.performFetch()
                 if let fetchedObjects = fetchResultController.fetchedObjects {
-                    searchResultsFromLocalDB = fetchedObjects
+                    resultsFromLocalDB = fetchedObjects
                 }
             } catch {
                 print(error)
@@ -223,5 +191,16 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         //MARK - Warning Pallavi see before release
        // tableView.endUpdates()
         
+    }
+    
+    //MARK: - NAVIGATE TO DETAIL VC
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showMovieDetail" {
+            if let indexPaths = collectionView?.indexPathsForSelectedItems {
+                let destinationController = segue.destination as! MovieDetailViewController
+                destinationController.imgID = self.listSearchValue[indexPaths[0].row].imdbID
+                collectionView?.deselectItem(at: indexPaths[0], animated: false)
+            }
+        }
     }
 }

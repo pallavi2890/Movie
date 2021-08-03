@@ -13,7 +13,7 @@ struct MoveiDetailModel : Codable {
     var Year : String = ""
     var Rated : String = ""
     var Released : String = ""
-    var Runtime : String = ""
+    var duration : String = ""
     var Genre : String = ""
     var Director : String = ""
     var Writer : String = ""
@@ -32,7 +32,7 @@ struct MoveiDetailModel : Codable {
     var BoxOffice : String = ""
     var Production : String = ""
     var Website : String = ""
-    var Response : Bool = false
+    var Response : String = ""
     var Ratings : [Rating]
     
     enum CodingKeys : String,CodingKey {
@@ -40,7 +40,7 @@ struct MoveiDetailModel : Codable {
         case Year
         case Rated
         case Released
-        case Runtime
+        case duration = "Runtime"
         case Genre
         case Director
         case Writer

@@ -19,7 +19,6 @@ extension ResponseHandler {
         let jsonDecoder = JSONDecoder()
         do {
             let body = try jsonDecoder.decode(T.self, from: data)
-            print("Response after decoding = \(body)")
             if response.statusCode == 200 {
                 return body
             } else {

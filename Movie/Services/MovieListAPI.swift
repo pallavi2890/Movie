@@ -10,19 +10,13 @@ import Foundation
 
 struct MovieListAPI : APIHandler{
     func makeRequest(from param: [String: Any]) -> URLRequest? {
-        //let urlString =  APIPath().gallary
-        //let urlString = "http://www.omdbapi.com/?"
-        let urlString = "http://www.omdbapi.com/?apikey=def4478&s=Avengers&type=movie"
-        // let urlString = "https://api.kivaws.org/v1/loans/newest.json"
-       // let urlString = "http://www.omdbapi.com/?apikey=def4478&i=tt0848228"
-
+        let urlString = "http://www.omdbapi.com/?" 
+       
         if var url = URL(string: urlString) {
             if param.count > 0 {
                 url = setQueryParams(parameters: param, url: url)
             }
             var urlRequest = URLRequest(url: url)
-            #warning("Pallavi check header")
-            //setDefaultHeaders(request: &urlRequest)
             urlRequest.httpMethod = HTTPMethod.get.rawValue
             return urlRequest
         }

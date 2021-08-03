@@ -28,7 +28,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
         objMovieViewModel = MovieViewModel()
         
-        self.title = "Search Your Favourite Movie"
+        self.title = "Movie List"
         // Configure the layout and item size
         if let layout = collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = CGSize(width: 170, height: 230)

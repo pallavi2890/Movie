@@ -48,7 +48,7 @@ class MovieCollectionViewController: UICollectionViewController,UISearchResultsU
         
         collectionView.dataSource = self
         
-       // callMoviListAPI(searchMovie: "Avengers")
+        callMoviListAPI(searchMovie: "Marvel")
     }
 
     // MARK: UICollectionViewDataSource
